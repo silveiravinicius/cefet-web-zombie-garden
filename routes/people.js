@@ -67,6 +67,24 @@ router.get('/new/', (req, res) => {
 //      - Em caso de sucesso do INSERT, colocar uma mensagem feliz
 //      - Em caso de erro do INSERT, colocar mensagem vermelhinha
 
+router.post('/', function(req, resp) {
+  let name = db.escape(req.body.name);
+  let query_sql ='INSERT INTO person (name) VALUES (' + name + ');'
+  db.query(query_sql, function(err, result) {
+    if(err){
+      req.flash('error', 'Pessoa inexistente');
+      resp.send(401, 'Erro: A pessoa não foi criada');
+      return;
+    }
+    else {
+      req.flash('peopleCountChange','+1');
+      req.flash('success', 'Nova pessoa criada: ' + req.body.name);
+      resp.redirect('/people/');
+    }
+    
+  });
+});
+
 
 /* DELETE uma pessoa */
 // Exercício 2: IMPLEMENTAR AQUI
@@ -76,6 +94,20 @@ router.get('/new/', (req, res) => {
 //      - Em caso de sucesso do INSERT, colocar uma mensagem feliz
 //      - Em caso de erro do INSERT, colocar mensagem vermelhinha
 
+router.delete('/:id', function(req, res) {
+  var id = db.escape(req.params.id);
+  var query_sql = `DELETE FROM person WHERE id = ${id}`;
+  db.query(query_sql, function(err, result) {
+    if(err){
+      req.flash('error', 'Pessoa inexistente');
+      res.send(401, 'Erro: Não Existe essa Pessoa');
+    }else{
+      req.flash('success', 'Pessoa Não Existe Mais');
+      res.redirect('/people/');
+     
+    }
+  });
+});
 
 
 module.exports = router;
